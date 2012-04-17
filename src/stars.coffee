@@ -1,7 +1,7 @@
 define ["lib/kinetic", "config", "eventbus"], (Kinetic, config, eventbus) ->
   class Star
     constructor: (args) ->
-      kineticStar = new Kinetic.Star
+      @kineticStar = new Kinetic.Star
         points: args.points
         outerRadius: args.outerRadius
         innerRadius: args.innerRadius
@@ -11,25 +11,22 @@ define ["lib/kinetic", "config", "eventbus"], (Kinetic, config, eventbus) ->
         fill: args.color
         alpha: args.alpha
 
-      velocityRatio = args.velocityRatio
+      @velocityRatio = args.velocityRatio
 
-      @getKineticStar = ->
-        kineticStar
+    update: (velocity) ->
+      newPosition = util.adjustScreenPosition
+        position: @getPosition().add(velocity.multiply(@velocityRatio))
+        width: config.width
+        height: config.height
 
-      @update = (velocity) ->
-        newPosition = util.adjustScreenPosition
-          position: getPosition().add(velocity.multiply(velocityRatio))
-          width: config.width
-          height: config.height
+      @setPosition newPosition
 
-        setPosition newPosition
+    getPosition: ->
+      new Vector(@kineticStar.attrs.x, @kineticStar.attrs.y)
 
-      getPosition = ->
-        new Vector(kineticStar.attrs.x, kineticStar.attrs.y)
-
-      setPosition = (vec) ->
-        kineticStar.attrs.x = vec.x
-        kineticStar.attrs.y = vec.y
+    setPosition: (vec) ->
+      @kineticStar.attrs.x = vec.x
+      @kineticStar.attrs.y = vec.y
 
   layer = new Kinetic.Layer()
 
@@ -56,7 +53,7 @@ define ["lib/kinetic", "config", "eventbus"], (Kinetic, config, eventbus) ->
       velocityRatio: 1 / 6
 
   stars.forEach (star) =>
-    layer.add star.getKineticStar()
+    layer.add star.kineticStar
   #
   #  move = (vec) =>
   #    stars.forEach (star) ->
