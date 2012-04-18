@@ -19,24 +19,25 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
         stroke: "green"
         strokeWidth: 1
 
-      @velocity = new Vector(0, -1)
+      @velocity = new Vector(0, -2)
 
     update: ->
-      newPosition = util.adjustScreenPosition
+      @setPosition util.adjustScreenPosition
         position: @getPosition().add(@velocity)
         width: config.width
         height: config.height
 
-      @setPosition newPosition
-
     getPosition: ->
-      new Vector(@shape.attrs.x, @shape.attrs.y)
+      new Vector @shape.attrs.x, @shape.attrs.y
 
     setPosition: (vec) ->
       @shape.attrs.x = vec.x
       @shape.attrs.y = vec.y
 
   layer = new Kinetic.Layer()
+
+  # declare ship here to make it available to other functions
+  ship = null
 
   init = ->
     ship = new Ship()
@@ -46,6 +47,9 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
       ship.update()
       layer.draw()
 
+  getVelocity = -> ship.velocity
 
+  # define return object - revealing module pattern
   init: init
   layer: layer
+  velocity: getVelocity
