@@ -1,4 +1,4 @@
-define ["jquery", "config", "asteroids"], ($, config, asteroids) ->
+define ["jquery", "config", "controls", "asteroids"], ($, config, controls, asteroids) ->
 
   config.container = "container"
   config.width = window.innerWidth
@@ -6,5 +6,7 @@ define ["jquery", "config", "asteroids"], ($, config, asteroids) ->
 
   $(document).ready ->
     console.log "document ready"
+
+    controls.init()
 
     asteroids.start()

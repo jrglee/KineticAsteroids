@@ -63,9 +63,12 @@ define ["lib/kinetic", "vector", "config", "eventbus", "ship", "util"], (Kinetic
 
     # subscribe to update events
     eventbus.updated.add ->
-      stars.forEach (star) ->
-        star.update ship.velocity()
-      layer.draw()
+      vel = ship.velocity()
+
+      if vel.x != 0 && vel.y != 0
+        stars.forEach (star) ->
+          star.update ship.velocity()
+        layer.draw()
 
   # define return object - revealing module pattern
   init: init

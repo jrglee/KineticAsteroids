@@ -27,6 +27,19 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
         width: config.width
         height: config.height
 
+    accelerate: (acceleration) ->
+      # determine angle of movement
+      a = @getAngle()
+
+      # convert acceleration into a vector and add to velocity
+      vel = @velocity.add(new Vector(acceleration * Math.cos(a), acceleration * Math.sin(a)))
+
+      # set max velocity if needed
+      vel = vel.normalize().multiply(config.maxSpeed) if vel.length() > config.maxSpeed
+
+      # update velocity attribute with new calculated vector
+      @velocity = vel
+
     getPosition: ->
       new Vector @shape.attrs.x, @shape.attrs.y
 
@@ -34,20 +47,32 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
       @shape.attrs.x = vec.x
       @shape.attrs.y = vec.y
 
+    getAngle: ->
+      @shape.getRotation() + Math.PI * 3 / 2
+
+  # layer to render the ship
   layer = new Kinetic.Layer()
 
-  # declare ship here to make it available to other functions
+  # ship instance
   ship = null
+
+  # function
 
   init = ->
     ship = new Ship()
     layer.add ship.shape
 
-    eventbus.updated.add ->
-      ship.update()
-      layer.draw()
+    eventbus.updated.add update
+    eventbus.accelerated.add accelerate
 
   getVelocity = -> ship.velocity
+
+  update = ->
+    ship.update()
+    layer.draw()
+
+  accelerate = (v) ->
+    ship.accelerate(v)
 
   # define return object - revealing module pattern
   init: init
