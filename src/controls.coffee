@@ -1,8 +1,16 @@
 define ["jquery", "config", "eventbus"], ($, config, eventbus) ->
+  keyPressed = {}
+
   init= ->
     $(document).keydown (e) ->
-      switch e.keyCode
+      keyPressed[e.keyCode] = true
 
+    $(document).keyup (e) ->
+      delete keyPressed[e.keyCode]
+
+  dispatchKeyActions = ->
+    for keyCode of keyPressed
+      switch Number(keyCode)
       # left arrow or a
         when 37, 65
           turnLeft()
@@ -40,3 +48,5 @@ define ["jquery", "config", "eventbus"], ($, config, eventbus) ->
 
   # wrap public functions into the return object
   init: init
+  dispatch: dispatchKeyActions
+
