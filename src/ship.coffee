@@ -64,6 +64,7 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
 
     eventbus.updated.add update
     eventbus.accelerated.add accelerate
+    eventbus.turned.add turn
 
   getVelocity = -> ship.velocity
 
@@ -73,6 +74,9 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
 
   accelerate = (v) ->
     ship.accelerate(v)
+
+  turn = (angle) ->
+    ship.shape.rotateDeg(angle)
 
   # define return object - revealing module pattern
   init: init
