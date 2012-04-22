@@ -3,6 +3,6 @@ define ->
   container: "container"
   width: 800
   height: 600
-  turnAngle: 1
+  turnAngle: 2
   acceleration: 0.2
   backgroundRatio: 1.5

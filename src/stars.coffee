@@ -38,7 +38,7 @@ define ["lib/kinetic", "vector", "config", "eventbus", "ship", "util"], (Kinetic
     stars = []
 
     # add background stars
-    [0...400].forEach ->
+    [0...300].forEach ->
       stars.push new Star
         points: 5
         outerRadius: 3
