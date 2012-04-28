@@ -6,5 +6,5 @@ define ->
   turnAngle: 2
   acceleration: 0.2
   backgroundRatio: 1.5
-  bulletSpeed: 10
-  shootInterval: 400
+  bulletSpeed: 8
+  shootInterval: 200

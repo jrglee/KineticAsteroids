@@ -71,10 +71,17 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
           c.closePath()
           @fillStroke()
 
+      @position = new Vector()
       @velocity = new Vector()
 
-    update: ->
+    setPosition: (v) ->
+      @position = v
+      @img.setX(v.x)
+      @img.setY(v.y)
+      @
 
+    update: ->
+      @setPosition @position.add(@velocity)
 
     setVelocity: (scalarVelocity, angle) ->
 
@@ -89,6 +96,23 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
     pool: []
     used: []
     lastShot: 0
+    update: ->
+      remaining = []
+      @used.forEach (bullet) =>
+        bullet.update()
+
+        if bullet.position.x < 0 ||
+        bullet.position.x > config.width ||
+        bullet.position.y < 0 ||
+        bullet.position.y > config.height
+          @pool.push bullet
+
+          # remove from layer
+          layer.remove(bullet.img)
+        else
+          remaining.push bullet
+
+      @used = remaining
 
   # functions
 
@@ -105,6 +129,7 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
 
   update = ->
     ship.update()
+    bullets.update()
     layer.draw()
 
   accelerate = (v) ->
@@ -125,8 +150,7 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
 
     bullet = if bullets.pool.length == 0 then new Bullet() else bullets.pool.pop()
 
-    bullet.img.setX(ship.getPosition().x)
-    bullet.img.setY(ship.getPosition().y)
+    bullet.setPosition(ship.getPosition())
 
     angle = ship.getAngle()
 
