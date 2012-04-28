@@ -1,44 +1,53 @@
-define ["lib/kinetic", "vector", "config", "eventbus", "ship", "util"], (Kinetic, Vector, config, eventbus, ship, util) ->
+define ["lib/kinetic", "vector", "config", "eventbus", "ship"], (Kinetic, Vector, config, eventbus, ship) ->
+  maxWidth = config.width * config.backgroundRatio
+  maxHeight = config.height * config.backgroundRatio
+
   class Star
     constructor: (args) ->
       @kineticStar = new Kinetic.Star
         points: args.points
         outerRadius: args.outerRadius
         innerRadius: args.innerRadius
-        x: Math.random() * config.width * config.backgroundRatio
-        y: Math.random() * config.height * config.backgroundRatio
         rotation: Math.random() * Math.PI * 2
         fill: args.color
         alpha: args.alpha
 
-      # invert velocity for opposite movement
-      @velocityRatio = -args.velocityRatio
+      @position = new Vector(Math.random() * maxWidth, Math.random() * maxHeight)
+      @velocityRatio = args.velocityRatio
 
     update: (velocity) ->
-      @setPosition util.adjustScreenPosition
-        position: @getPosition().add(velocity.multiply(@velocityRatio))
-        width: config.width * config.backgroundRatio
-        height: config.height * config.backgroundRatio
+      pos = @position.add velocity.multiply(-@velocityRatio)
 
-    getPosition: ->
-      new Vector @kineticStar.attrs.x, @kineticStar.attrs.y
+      x = pos.x
+      y = pos.y
+
+      if x < 0
+        x = maxWidth - x
+      else if x > maxWidth
+        x -= maxWidth
+
+      if y < 0
+        y = maxHeight - y
+      else if y > maxHeight
+        y -= maxHeight
+
+      @setPosition new Vector(x, y)
 
     setPosition: (vec) ->
-      @kineticStar.attrs.x = vec.x
-      @kineticStar.attrs.y = vec.y
+      @position = vec
+      @kineticStar.setX(vec.x)
+      @kineticStar.setY(vec.y)
 
   layer = new Kinetic.Layer()
 
-  init= ->
+  stars = []
 
-    ###
-     create all the stars inside init to make sure all widths and heights
-     were set by the dom update
-    ###
-    stars = []
+  init = ->
+    # determine number of stars based on available screen size
+    ratio = Math.floor(maxWidth * maxHeight / 20000)
 
     # add background stars
-    [0...300].forEach ->
+    [0... ratio * 3].forEach ->
       stars.push new Star
         points: 5
         outerRadius: 3
@@ -48,7 +57,7 @@ define ["lib/kinetic", "vector", "config", "eventbus", "ship", "util"], (Kinetic
         velocityRatio: 0.1
 
     # add foreground stars
-    [0...100].forEach ->
+    [0... ratio].forEach ->
       stars.push new Star
         points: 6
         outerRadius: 4
@@ -58,17 +67,19 @@ define ["lib/kinetic", "vector", "config", "eventbus", "ship", "util"], (Kinetic
         velocityRatio: 1 / 6
 
     # add all stars to layer to be rendered
-    stars.forEach (star) =>
+    stars.forEach (star) ->
       layer.add star.kineticStar
 
     # subscribe to update events
-    eventbus.updated.add ->
-      vel = ship.velocity()
+    eventbus.updated.add update
 
-      if vel.x != 0 && vel.y != 0
-        stars.forEach (star) ->
-          star.update ship.velocity()
-        layer.draw()
+  update = ->
+    vel = ship.velocity()
+
+    stars.forEach (star) ->
+      star.update vel
+
+    layer.draw()
 
   # define return object - revealing module pattern
   init: init
