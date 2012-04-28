@@ -1,5 +1,9 @@
 define ->
   class Vector
+
+    @fromScalar = (length, angle) ->
+      new Vector(length * Math.cos(angle), length * Math.sin(angle))
+
     constructor: (@x = 0, @y = 0) ->
 
     add: (vec) ->
@@ -18,8 +22,11 @@ define ->
       a = Math.atan2(@y, @x)
       new Vector(Math.cos(a), Math.sin(a))
 
-    clone: ->
-      new Vector(@x, @y)
-
     toString: ->
       "#{@x},#{@y}"
+
+    floor: ->
+      new Vector(Math.floor(@x), Math.floor(@y))
+
+    angle: ->
+      Math.atan2(@y, @x)

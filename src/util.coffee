@@ -1,7 +1,7 @@
 define ["vector"], (Vector) ->
 
   adjustScreenPosition: (args) ->
-    newPosition = args.position.clone()
+    newPosition = args.position
 
     if newPosition.x < 0 then newPosition.x = args.width
     if newPosition.x > args.width then newPosition.x = 0

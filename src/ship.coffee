@@ -85,8 +85,6 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
 
     setVelocity: (scalarVelocity, angle) ->
 
-
-      # layer to render the ship
   layer = new Kinetic.Layer()
 
   # ship instance
@@ -150,7 +148,7 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
 
     bullet = if bullets.pool.length == 0 then new Bullet() else bullets.pool.pop()
 
-    bullet.setPosition(ship.getPosition())
+    bullet.setPosition(ship.getPosition().add(Vector.fromScalar(12, ship.getAngle())))
 
     angle = ship.getAngle()
 
