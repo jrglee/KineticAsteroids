@@ -2,8 +2,6 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
   class Ship
     constructor: ->
       @shape = new Kinetic.Shape
-        x: config.width / 2
-        y: config.height / 2
         centerOffset:
           x: 8
           y: 12
@@ -19,20 +17,18 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
         stroke: "green"
         strokeWidth: 1
 
+      @position = new Vector(config.width / 2, config.height / 2)
       @velocity = new Vector(0, -2)
 
     update: ->
       @setPosition util.adjustScreenPosition
-        position: @getPosition().add(@velocity)
+        position: @position.add @velocity
         width: config.width
         height: config.height
 
-    accelerate: (acceleration) ->
-      # determine angle of movement
-      a = @getAngle()
-
+    accelerate: (accel) ->
       # convert acceleration into a vector and add to velocity
-      vel = @velocity.add(new Vector(acceleration * Math.cos(a), acceleration * Math.sin(a)))
+      vel = @velocity.add(Vector.fromScalar(accel, @getAngle()))
 
       # set max velocity if needed
       vel = vel.normalize().multiply(config.maxSpeed) if vel.length() > config.maxSpeed
@@ -40,12 +36,10 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
       # update velocity attribute with new calculated vector
       @velocity = vel
 
-    getPosition: ->
-      new Vector @shape.attrs.x, @shape.attrs.y
-
     setPosition: (vec) ->
-      @shape.attrs.x = vec.x
-      @shape.attrs.y = vec.y
+      @position = vec
+      @shape.setX(vec.x)
+      @shape.setY(vec.y)
 
     getAngle: ->
       @shape.getRotation() + Math.PI * 3 / 2
@@ -82,8 +76,6 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
 
     update: ->
       @setPosition @position.add(@velocity)
-
-    setVelocity: (scalarVelocity, angle) ->
 
   layer = new Kinetic.Layer()
 
@@ -148,11 +140,8 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
 
     bullet = if bullets.pool.length == 0 then new Bullet() else bullets.pool.pop()
 
-    bullet.setPosition(ship.getPosition().add(Vector.fromScalar(12, ship.getAngle())))
-
-    angle = ship.getAngle()
-
-    bullet.velocity = new Vector(config.bulletSpeed * Math.cos(angle), config.bulletSpeed * Math.sin(angle))
+    bullet.setPosition Vector.fromScalar(12, ship.getAngle()).add(ship.position)
+    bullet.velocity = Vector.fromScalar(config.bulletSpeed, ship.getAngle())
 
     layer.add bullet.img
 

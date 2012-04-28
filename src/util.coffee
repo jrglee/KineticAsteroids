@@ -9,6 +9,3 @@ define ["vector"], (Vector) ->
     if newPosition.y > args.height then newPosition.y = 0
 
     newPosition
-
-  distance: (v1, v2) ->
-    Math.sqrt(Math.pow(v2.x - v1.x, 2) + Math.pow(v2.y - v1.y))
