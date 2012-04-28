@@ -50,13 +50,47 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
     getAngle: ->
       @shape.getRotation() + Math.PI * 3 / 2
 
-  # layer to render the ship
+  class Bullet
+    constructor: ->
+      @img = new Kinetic.Shape
+        centerOffset:
+          x: 4
+          y: 4
+        drawFunc: ->
+          c = @getContext()
+
+          gradient = c.createRadialGradient(4, 4, 0.1, 4, 4, 5)
+          gradient.addColorStop(0.1, "rgba(255, 255, 255, 1)")
+          gradient.addColorStop(0.4, "rgba(255, 0, 0, 0.6)")
+          gradient.addColorStop(1, "rgba(255, 255, 0, 0.1)")
+
+          @setFill(gradient)
+
+          c.beginPath()
+          c.arc(4, 4, 5, 0, Math.PI * 2, true)
+          c.closePath()
+          @fillStroke()
+
+      @velocity = new Vector()
+
+    update: ->
+
+
+    setVelocity: (scalarVelocity, angle) ->
+
+
+      # layer to render the ship
   layer = new Kinetic.Layer()
 
   # ship instance
   ship = null
 
-  # function
+  bullets =
+    pool: []
+    used: []
+    lastShot: 0
+
+  # functions
 
   init = ->
     ship = new Ship()
@@ -65,6 +99,7 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
     eventbus.updated.add update
     eventbus.accelerated.add accelerate
     eventbus.turned.add turn
+    eventbus.shot.add shoot
 
   getVelocity = -> ship.velocity
 
@@ -77,6 +112,29 @@ define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector
 
   turn = (angle) ->
     ship.shape.rotateDeg(angle)
+
+  shoot = ->
+    time = new Date().getTime()
+
+    # enforce shooting interval
+    return undefined if time - bullets.lastShot < config.shootInterval
+    bullets.lastShot = time
+
+    # create bullet and add to the stage
+    console.log "shoot"
+
+    bullet = if bullets.pool.length == 0 then new Bullet() else bullets.pool.pop()
+
+    bullet.img.setX(ship.getPosition().x)
+    bullet.img.setY(ship.getPosition().y)
+
+    angle = ship.getAngle()
+
+    bullet.velocity = new Vector(config.bulletSpeed * Math.cos(angle), config.bulletSpeed * Math.sin(angle))
+
+    layer.add bullet.img
+
+    bullets.used.push bullet
 
   # define return object - revealing module pattern
   init: init
