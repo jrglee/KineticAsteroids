@@ -1,0 +1,72 @@
+def jsbuild = "${buildDir}/jsbuild"
+def asteroidsDir = "${buildDir}/asteroids"
+def toolsDir = "${buildDir}/tools"
+
+repositories {
+    mavenCentral()
+    mavenRepo(name: "JQuery", url: "http://code.jquery.com") {
+        pattern = "[module]-[revision](.[classifier]).[ext]"
+    }
+}
+
+configurations {
+    js
+    rhino
+    coffee
+}
+
+dependencies {
+    js group: 'jquery', name: 'jquery', version: '1.7.2', classifier: 'min', ext: "js"
+    rhino 'org.mozilla:rhino:1.7R3'
+}
+
+task clean << {
+    delete buildDir
+}
+
+task copyStaticFiles(type: Copy, dependsOn: 'clean') {
+    from '.'
+    include '*.html'
+    include 'css/*'
+    into asteroidsDir
+}
+
+task copyLibs(type: Copy, dependsOn: 'clean') {
+    from 'lib/'
+    include '*.js'
+    into jsbuild
+}
+
+task compileCoffe(dependsOn: "fetchDependencies") {
+    def input = fileTree(dir: "src", include: "**/*.coffee")
+    doLast {
+        input.files.each { File f ->
+            def output = f.path.replaceAll(file("./src").path, "${jsbuild}/js").replaceAll(".coffee", ".js")
+            file(output).parentFile.mkdirs()
+            println "Compiling ${f.path} to ${output}"
+            ant.java(jar: configurations.rhino.asPath, fork: true, output: output) {
+                arg(value: "-e")
+                arg(value: "eval(readFile('${toolsDir}/coffee-script.js'));print(CoffeeScript.compile(readFile('${f.path}')));")
+            }
+        }
+    }
+}
+
+task fetchJs(type: Copy) {
+    from configurations.js
+    into "$jsbuild/lib"
+}
+
+task fetchCoffee << {
+    file(toolsDir).mkdirs()
+    ant.get(src:"http://coffeescript.org/extras/coffee-script.js", dest: toolsDir)
+}
+
+task fetchRhino(type:Copy) {
+    from configurations.rhino
+    into "${buildDir}/java"
+}
+
+task fetchDependencies {
+    dependsOn clean, fetchJs, fetchCoffee, fetchRhino
+}
