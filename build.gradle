@@ -36,7 +36,7 @@ task copyLibs(type: Copy, dependsOn: 'clean') {
     into jsbuild
 }
 
-task compileCoffe(dependsOn: "fetchDependencies") {
+task compileCoffee(dependsOn: "fetchDependencies") {
     def input = fileTree(dir: "src", include: "**/*.coffee")
     doLast {
         input.files.each { File f ->
