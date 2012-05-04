@@ -12,7 +12,6 @@ repositories {
 configurations {
     js
     rhino
-    coffee
 }
 
 dependencies {
@@ -41,12 +40,20 @@ task compileCoffe(dependsOn: "fetchDependencies") {
     def input = fileTree(dir: "src", include: "**/*.coffee")
     doLast {
         input.files.each { File f ->
+            // determine new file name
             def output = f.path.replaceAll(file("./src").path, "${jsbuild}/js").replaceAll(".coffee", ".js")
+
+            // create any parent dir needed
             file(output).parentFile.mkdirs()
+
+            // load rhino and compile each coffee file individually
             println "Compiling ${f.path} to ${output}"
             ant.java(jar: configurations.rhino.asPath, fork: true, output: output) {
                 arg(value: "-e")
-                arg(value: "eval(readFile('${toolsDir}/coffee-script.js'));print(CoffeeScript.compile(readFile('${f.path}')));")
+                arg(value: """
+                    eval(readFile('${toolsDir}/coffee-script.js'));
+                    print(CoffeeScript.compile(readFile('${f.path}')));
+                """)
             }
         }
     }
@@ -59,10 +66,10 @@ task fetchJs(type: Copy) {
 
 task fetchCoffee << {
     file(toolsDir).mkdirs()
-    ant.get(src:"http://coffeescript.org/extras/coffee-script.js", dest: toolsDir)
+    ant.get(src: "http://coffeescript.org/extras/coffee-script.js", dest: toolsDir)
 }
 
-task fetchRhino(type:Copy) {
+task fetchRhino(type: Copy) {
     from configurations.rhino
     into "${buildDir}/java"
 }
