@@ -109,7 +109,7 @@ define [
   # functions
 
   init = ->
-    ship = new Ship()
+    ship = new Ship
     layer.add ship.shape
 
     eventbus.updated.add update
