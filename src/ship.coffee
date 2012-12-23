@@ -8,17 +8,17 @@ define [
   class Ship
     constructor: ->
       @shape = new Kinetic.Shape
-        centerOffset:
+        offset:
           x: 8
           y: 12
-        drawFunc: ->
-          ctx = @getContext()
+        drawFunc: (canvas) ->
+          ctx = canvas.getContext()
           ctx.beginPath()
           ctx.moveTo(8, 0)
           ctx.lineTo(16, 21)
           ctx.quadraticCurveTo(8, 10, 0, 21)
           ctx.closePath()
-          @fillStroke()
+          canvas.fillStroke(this)
         fill: "E3E186"
         stroke: "green"
         strokeWidth: 1
@@ -52,24 +52,22 @@ define [
 
   class Bullet
     constructor: ->
-      @img = new Kinetic.Shape
-        centerOffset:
-          x: 4
-          y: 4
-        drawFunc: ->
-          c = @getContext()
-
-          gradient = c.createRadialGradient(4, 4, 0.1, 4, 4, 5)
-          gradient.addColorStop(0.1, "rgba(255, 255, 255, 1)")
-          gradient.addColorStop(0.4, "rgba(255, 0, 0, 0.6)")
-          gradient.addColorStop(1, "rgba(255, 255, 0, 0.1)")
-
-          @setFill(gradient)
-
-          c.beginPath()
-          c.arc(4, 4, 5, 0, Math.PI * 2, true)
-          c.closePath()
-          @fillStroke()
+      @img = new Kinetic.Circle
+        radius: 4
+        fill:
+          start:
+            x: 0
+            y: 0
+            radius: 0
+          end:
+            x: 0
+            y: 0
+            radius: 4
+          colorStops: [
+            0.1, 'rgba(255, 255, 255, 1)'
+            0.4, 'rgba(255, 0, 0, 0.6)'
+            1, 'rgba(255, 255, 0, 0.1)'
+          ]
 
       @position = new Vector()
       @velocity = new Vector()
@@ -78,7 +76,7 @@ define [
       @position = v
       @img.setX(v.x)
       @img.setY(v.y)
-      @
+      this
 
     update: ->
       @setPosition @position.add(@velocity)
@@ -102,11 +100,9 @@ define [
         bullet.position.y < 0 ||
         bullet.position.y > config.height
           @pool.push bullet
-
-          # remove from layer
-          layer.remove(bullet.img)
         else
           remaining.push bullet
+          layer.add bullet.img
 
       @used = remaining
 
@@ -124,6 +120,8 @@ define [
   getVelocity = -> ship.velocity
 
   update = ->
+    layer.removeChildren()
+    layer.add ship.shape
     ship.update()
     bullets.update()
     layer.draw()
@@ -142,14 +140,10 @@ define [
     bullets.lastShot = time
 
     # create bullet and add to the stage
-    console.log "shoot"
-
     bullet = if bullets.pool.length == 0 then new Bullet() else bullets.pool.pop()
 
-    bullet.setPosition Vector.fromScalar(12, ship.getAngle()).add(ship.position)
+    bullet.setPosition Vector.fromScalar(12, ship.getAngle()).add ship.position
     bullet.velocity = Vector.fromScalar(config.bulletSpeed, ship.getAngle())
-
-    layer.add bullet.img
 
     bullets.used.push bullet
 

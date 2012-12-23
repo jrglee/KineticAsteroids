@@ -37,7 +37,7 @@ define [
   class Star
     constructor: (args) ->
       @kineticStar = new Kinetic.Star
-        points: args.points
+        numPoints: args.points
         outerRadius: args.outerRadius
         innerRadius: args.innerRadius
         rotation: Math.random() * Math.PI * 2

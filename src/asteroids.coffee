@@ -1,27 +1,30 @@
 define [
+  'kinetic'
   "cs!config"
   "cs!eventbus"
   "cs!controls"
-  "cs!stage"
   "cs!background"
   "cs!stars"
   "cs!ship"
-], (config, eventbus, controls, stage, background, stars, ship) ->
+], (Kinetic, config, eventbus, controls, background, stars, ship) ->
   initialized = false
 
   init = ->
     console.log "Initializing asteroids module"
 
-    stage.init()
+    stage = new Kinetic.Stage
+      container: config.container
+      width: config.width
+      height: config.height
 
-    stage.add [background, stars, ship].map (l) ->
-      l.init() if l.init
-      l.layer
+    for l in [background, stars, ship]
+      l.init?()
+      stage.add l.layer
 
     # initialize control module before starting the animation loop
     controls.init()
 
-    stage.onFrame (frame) ->
+    anim = new Kinetic.Animation (frame) ->
       # apply user actions
       controls.dispatch()
 
@@ -29,7 +32,7 @@ define [
       eventbus.updated.dispatch()
 
     # start game loop
-    stage.start()
+    anim.start()
 
   start: ->
     if !initialized
