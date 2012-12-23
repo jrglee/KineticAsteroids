@@ -4,15 +4,14 @@ define [
   "cs!eventbus"
 ], (
   $
-  config
-  eventbus
+  {turnAngle, acceleration}
+  {turned, accelerated, shot}
 ) ->
 
   keyPressed = {}
 
   init= ->
     $(document).keydown (e) -> keyPressed[e.keyCode] = true
-
     $(document).keyup (e) -> delete keyPressed[e.keyCode]
 
   dispatchKeyActions = ->
@@ -33,16 +32,11 @@ define [
       # space bar
         when 32 then shoot()
 
-  turnLeft = -> eventbus.turned.dispatch -config.turnAngle
-
-  turnRight = -> eventbus.turned.dispatch config.turnAngle
-
-  accelerate = -> eventbus.accelerated.dispatch config.acceleration
-
-  reverse = -> eventbus.accelerated.dispatch -config.acceleration
-
-  shoot = -> eventbus.shot.dispatch()
+  turnLeft = -> turned.dispatch -turnAngle
+  turnRight = -> turned.dispatch turnAngle
+  accelerate = -> accelerated.dispatch acceleration
+  reverse = -> accelerated.dispatch -acceleration
+  shoot = -> shot.dispatch()
 
   init: init
   dispatch: dispatchKeyActions
-
