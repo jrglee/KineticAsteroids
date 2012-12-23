@@ -1,4 +1,10 @@
-define ["lib/kinetic", "vector", "config", "util", "eventbus"], (Kinetic, Vector, config, util, eventbus) ->
+define [
+  "kinetic"
+  "cs!vector"
+  "cs!config"
+  "cs!util"
+  "cs!eventbus"
+], (Kinetic, Vector, config, util, eventbus) ->
   class Ship
     constructor: ->
       @shape = new Kinetic.Shape

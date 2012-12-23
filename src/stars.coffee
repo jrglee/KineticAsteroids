@@ -1,4 +1,10 @@
-define ["lib/kinetic", "vector", "config", "eventbus", "ship"], (Kinetic, Vector, config, eventbus, ship) ->
+define [
+  "kinetic"
+  "cs!vector"
+  "cs!config"
+  "cs!eventbus"
+  "cs!ship"
+], (Kinetic, Vector, config, eventbus, ship) ->
   maxWidth = 800
   maxHeight = 600
 

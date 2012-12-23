@@ -1,4 +1,8 @@
-define ["jquery", "config", "eventbus"], ($, config, eventbus) ->
+define [
+  "jquery"
+  "cs!config"
+  "cs!eventbus"
+], ($, config, eventbus) ->
   keyPressed = {}
 
   init= ->

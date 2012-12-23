@@ -1,4 +1,7 @@
-define ['lib/kinetic', 'config'], (Kinetic, config) ->
+define [
+  'kinetic'
+  'cs!config'
+], (Kinetic, config) ->
   kineticStage = null
 
   init = ->

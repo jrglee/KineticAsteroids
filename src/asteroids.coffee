@@ -1,4 +1,12 @@
-define ["config", "eventbus", "controls", "stage", "background", "stars", "ship"], (config, eventbus, controls, stage, background, stars, ship) ->
+define [
+  "cs!config"
+  "cs!eventbus"
+  "cs!controls"
+  "cs!stage"
+  "cs!background"
+  "cs!stars"
+  "cs!ship"
+], (config, eventbus, controls, stage, background, stars, ship) ->
   initialized = false
 
   init = ->

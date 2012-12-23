@@ -1,5 +1,8 @@
-define ["jquery", "config", "asteroids"], ($, config, asteroids) ->
-
+define [
+  "jquery"
+  "cs!config"
+  "cs!asteroids"
+], ($, config, asteroids) ->
   config.container = "container"
 
   $(document).ready ->
