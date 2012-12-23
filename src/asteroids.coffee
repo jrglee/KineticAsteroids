@@ -6,7 +6,15 @@ define [
   "cs!background"
   "cs!stars"
   "cs!ship"
-], (Kinetic, config, eventbus, controls, background, stars, ship) ->
+], (
+  Kinetic
+  config
+  eventbus
+  controls
+  background
+  stars
+  ship
+) ->
   initialized = false
 
   init = ->
@@ -24,7 +32,7 @@ define [
     # initialize control module before starting the animation loop
     controls.init()
 
-    anim = new Kinetic.Animation (frame) ->
+    anim = new Kinetic.Animation ->
       # apply user actions
       controls.dispatch()
 
