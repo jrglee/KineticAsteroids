@@ -1,0 +1,16 @@
+{
+  "name": "KineticAsteroids",
+  "version": "0.0.1",
+  "author": "Jorge Lee <jrg.lee@gmail.com>",
+  "description": "Asteroids in KineticJS",
+  "dependencies": {
+    "coffee-script": "1.4.x"
+  },
+  "devDependencies": {
+    "testacular": "0.5.x",
+    "phantomjs": "0.2.x"
+  },
+  "scripts": {
+    "test": "./node_modules/coffee-script/bin/cake test"
+  }
+}

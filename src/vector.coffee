@@ -1,10 +1,8 @@
 define ->
   class Vector
-
-    @fromScalar = (length, angle) ->
-      new Vector(length * Math.cos(angle), length * Math.sin(angle))
-
     constructor: (@x = 0, @y = 0) ->
+
+    @fromScalar: (length = 0, angle = 0) -> new Vector length * Math.cos(angle), length * Math.sin(angle)
 
     add: (vec) ->
       new Vector(@x + vec.x, @y + vec.y)
